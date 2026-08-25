@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>for Prestina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF3EC;
+    --cream:#FDF6F3;
+    --bubble-mine:#C97C93;
+    --bubble-mine-deep:#B15C77;
+    --bubble-theirs:#FFFFFF;
+    --plum:#4A2C3A;
+    --plum-soft:#7A5568;
+    --rose:#D98BA3;
+    --tape:#E8B7C4;
+    --leaf:#7C9A6C;
+    --line: rgba(74,44,58,0.12);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+
+  body{
+    background:var(--cream);
+    color:var(--plum);
+    font-family:'Karla', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  .screen{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:60px 6vw;
+    position:relative;
+  }
+
+  /* ============ INTRO ============ */
+  .intro{
+    background:linear-gradient(180deg, #2A1E24, #4A2C3A);
+    color:#F3E4E9;
+    text-align:center;
+  }
+  .intro .time{
+    font-size:0.85rem;
+    letter-spacing:0.08em;
+    opacity:0.55;
+    margin-bottom:8px;
+  }
+  .notif{
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:18px;
+    padding:18px 20px;
+    max-width:320px;
+    width:100%;
+    text-align:left;
+    margin-top:10px;
+    animation:float 3.5s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+  }
+  .notif-top{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .notif-avatar{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--rose);
+    flex-shrink:0;
+  }
+  .notif-name{font-size:0.82rem;font-weight:700;opacity:0.9;}
+  .notif-body{font-size:0.9rem;line-height:1.4;opacity:0.85;}
+  .intro .cue{
+    margin-top:48px;
+    font-size:0.72rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    opacity:0.45;
+  }
+
+  /* ============ CHAT THREAD ============ */
+  .chat-screen{
+    background:var(--cream);
+    align-items:stretch;
+    justify-content:flex-start;
+    padding:0;
+    min-height:auto;
+  }
+  .chat-header{
+    position:sticky;
+    top:0;
+    z-index:3;
+    background:rgba(253,246,243,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:18px 6vw 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .chat-avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--rose);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .chat-avatar svg{width:18px;height:18px;}
+  .chat-header-name{font-weight:700;font-size:0.95rem;color:var(--plum);}
+  .chat-header-sub{font-size:0.72rem;color:var(--plum-soft);}
+
+  .chat-body{
+    padding:28px 6vw 60px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-width:520px;
+    margin:0 auto;
+    width:100%;
+  }
+
+  .bubble-row{
+    display:flex;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity 0.5s ease, transform 0.5s cubic-bezier(.22,.9,.32,1);
+  }
+  .bubble-row.visible{opacity:1;transform:translateY(0);}
+  .bubble-row.mine{justify-content:flex-end;}
+  .bubble-row.theirs{justify-content:flex-start;}
+
+  .bubble{
+    max-width:78%;
+    padding:10px 15px;
+    border-radius:18px;
+    font-size:0.94rem;
+    line-height:1.42;
+  }
+  .mine .bubble{
+    background:var(--bubble-mine);
+    color:#fff;
+    border-bottom-right-radius:5px;
+  }
+  .theirs .bubble{
+    background:var(--bubble-theirs);
+    color:var(--plum);
+    border:1px solid var(--line);
+    border-bottom-left-radius:5px;
+  }
+
+  .typing-row{opacity:0;transform:translateY(10px); transition:opacity .5s ease, transform .5s ease;}
+  .typing-row.visible{opacity:1;transform:translateY(0);}
+  .typing-dots{
+    display:inline-flex;
+    gap:4px;
+    padding:12px 16px;
+    background:var(--bubble-theirs);
+    border:1px solid var(--line);
+    border-radius:18px;
+    border-bottom-left-radius:5px;
+  }
+  .typing-dots span{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--plum-soft);
+    opacity:0.5;
+    animation:blink 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2){animation-delay:0.2s;}
+  .typing-dots span:nth-child(3){animation-delay:0.4s;}
+  @keyframes blink{0%,60%,100%{opacity:0.3;}30%{opacity:0.9;}}
+
+  .day-marker{
+    text-align:center;
+    font-size:0.7rem;
+    color:var(--plum-soft);
+    opacity:0.6;
+    margin:14px 0 4px;
+  }
+
+  .continue-cue{
+    text-align:center;
+    padding:20px 0 8px;
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--rose);
+    opacity:0.7;
+  }
+
+  /* ============ LETTER ============ */
+  .letter-screen{
+    background:
+      radial-gradient(ellipse at top left, rgba(217,139,163,0.08), transparent 55%),
+      var(--paper);
+    padding:80px 6vw;
+  }
+  .letter-card{
+    max-width:480px;
+    width:100%;
+    margin:0 auto;
+    background:#FFFDF9;
+    border-radius:3px;
+    padding:44px 30px 40px;
+    box-shadow:0 18px 40px -12px rgba(74,44,58,0.22), 0 2px 8px rgba(74,44,58,0.08);
+    transform:rotate(-1.1deg);
+    position:relative;
+  }
+  .tape{
+    position:absolute;
+    width:74px;height:26px;
+    background:var(--tape);
+    opacity:0.75;
+    top:-13px;
+    box-shadow:0 2px 4px rgba(0,0,0,0.08);
+  }
+  .tape.t1{left:20px; transform:rotate(-8deg);}
+  .tape.t2{right:24px; transform:rotate(6deg); top:-13px;}
+
+  .mood-face{
+    width:64px;
+    height:64px;
+    margin:0 auto 16px;
+  }
+  .mood-face svg{width:100%;height:100%;}
+  .mood-face .eye{
+    fill:var(--plum);
+    transform-box:fill-box;
+    transform-origin:center;
+    animation:blink-eye 4.2s ease-in-out infinite;
+  }
+  .mood-face .mouth-sad{
+    stroke:var(--plum-soft);
+    stroke-width:3.2;
+    fill:none;
+    stroke-linecap:round;
+    animation:sad-fade 5.5s ease-in-out forwards;
+  }
+  .mood-face .mouth-happy{
+    stroke:var(--bubble-mine-deep);
+    stroke-width:3.2;
+    fill:none;
+    stroke-linecap:round;
+    opacity:0;
+    animation:happy-fade 5.5s ease-in-out forwards;
+  }
+  .mood-face .tear{
+    fill:var(--rose);
+    opacity:0;
+    animation:tear-fall 3.2s ease-in 1;
+  }
+  @keyframes blink-eye{
+    0%,88%,100%{transform:scaleY(1);}
+    93%{transform:scaleY(0.12);}
+  }
+  @keyframes sad-fade{
+    0%,55%{opacity:1;}
+    80%,100%{opacity:0;}
+  }
+  @keyframes happy-fade{
+    0%,55%{opacity:0;}
+    80%,100%{opacity:1;}
+  }
+  @keyframes tear-fall{
+    0%{opacity:0; transform:translateY(0);}
+    18%{opacity:1;}
+    55%{opacity:1; transform:translateY(9px);}
+    100%{opacity:0; transform:translateY(13px);}
+  }
+
+  .letter-body{
+    font-family:'Caveat', cursive;
+    font-size:1.5rem;
+    line-height:1.5;
+    color:var(--plum);
+  }
+  .letter-body p{margin-bottom:20px;}
+
+  .letter-list{
+    list-style:none;
+    margin:18px 0 22px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .letter-list li{
+    font-family:'Caveat', cursive;
+    font-size:1.4rem;
+    line-height:1.4;
+    color:var(--plum);
+    padding-left:22px;
+    position:relative;
+  }
+  .letter-list li::before{
+    content:'—';
+    position:absolute;
+    left:0;
+    color:var(--rose);
+  }
+
+  .letter-sign{
+    font-family:'Caveat', cursive;
+    font-size:1.7rem;
+    text-align:right;
+    margin-top:22px;
+    color:var(--plum);
+  }
+
+  .doodle-corner{
+    position:absolute;
+    bottom:-18px;
+    right:-14px;
+    width:70px;
+    opacity:0.9;
+  }
+
+  /* ============ FINAL / POLAROID ============ */
+  .final-screen{
+    background:var(--cream);
+  }
+  .polaroid{
+    background:#fff;
+    padding:18px 18px 50px;
+    box-shadow:0 20px 44px -14px rgba(74,44,58,0.28), 0 2px 8px rgba(74,44,58,0.1);
+    max-width:280px;
+    width:100%;
+    transform:rotate(1.5deg);
+    position:relative;
+  }
+  .polaroid-inner{
+    background:linear-gradient(180deg, #FBEFF2, #F6D9DF);
+    aspect-ratio:1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .polaroid-inner svg{width:58%;height:58%;}
+  .polaroid-caption{
+    font-family:'Caveat', cursive;
+    font-size:1.4rem;
+    text-align:center;
+    margin-top:14px;
+    color:var(--plum);
+  }
+  .polaroid-date{
+    font-family:'Karla', sans-serif;
+    font-size:0.62rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    text-align:center;
+    color:var(--plum-soft);
+    opacity:0.6;
+    margin-top:4px;
+  }
+
+  .final-note{
+    max-width:340px;
+    text-align:center;
+    margin-top:36px;
+    font-size:0.98rem;
+    line-height:1.7;
+    color:var(--plum-soft);
+  }
+
+  footer{
+    text-align:center;
+    padding:30px 6vw 90px;
+    font-size:0.74rem;
+    color:var(--plum-soft);
+    opacity:0.55;
+    background:var(--cream);
+  }
+
+  @media (max-width:400px){
+    .letter-card{padding:36px 22px 34px;}
+    .letter-body{font-size:1.38rem;}
+    .letter-list li{font-size:1.28rem;}
+  }
+  /* ============ FORGIVENESS QUESTIONS ============ */
+  .question-screen{background:var(--paper);text-align:center;}
+  .question-card{max-width:480px;width:100%;background:#FFFDF9;border:1px solid var(--line);border-radius:18px;padding:38px 28px;box-shadow:0 18px 40px -12px rgba(74,44,58,0.16);}
+  .question-card h2{font-family:'Caveat',cursive;font-size:2.35rem;font-weight:600;margin-bottom:10px;}
+  .question-card p{color:var(--plum-soft);line-height:1.55;margin-bottom:24px;}
+  .question-actions{display:flex;flex-direction:column;gap:10px;}
+  .question-actions button{border:0;border-radius:12px;padding:13px 18px;font:600 0.95rem 'Karla',sans-serif;}
+  .try-button{background:var(--bubble-mine);color:#fff;cursor:pointer;transition:transform .2s,background .2s;}
+  .try-button:hover{background:var(--bubble-mine-deep);transform:translateY(-2px);}
+  .no-button{background:#f1e8e5;color:var(--plum-soft);cursor:not-allowed;opacity:.55;}
+  .question-progress{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rose);margin-bottom:16px!important;}
+  .yay-screen{background:var(--cream);text-align:center;}
+  .yay-title{font-family:'Caveat',cursive;font-size:4rem;color:var(--bubble-mine-deep);animation:yay-pop .8s ease both;}
+  .yay-heart{font-size:4rem;animation:heart-bounce 1.4s ease-in-out infinite;}
+  .restart-button{margin-top:22px;background:transparent;color:var(--plum);border:1px solid var(--line);border-radius:12px;padding:11px 18px;cursor:pointer;font:600 .9rem 'Karla',sans-serif;}
+  @keyframes yay-pop{0%{opacity:0;transform:scale(.5) rotate(-8deg)}70%{transform:scale(1.12) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+  @keyframes heart-bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+</style>
+</head>
+<body>
+
+  <!-- ============ INTRO / LOCK SCREEN ============ -->
+  <section class="screen intro">
+    <div class="time">11:47 PM</div>
+    <div class="notif">
+      <div class="notif-top">
+        <div class="notif-avatar"></div>
+        <div>
+          <div class="notif-name">Sugam</div>
+        </div>
+      </div>
+      <div class="notif-body">sent you something. not another excuse, i promise. scroll when you're ready</div>
+    </div>
+    <div class="cue">↓ scroll to open ↓</div>
+  </section>
+
+  <!-- ============ CHAT RECREATION ============ -->
+  <section class="screen chat-screen">
+    <div class="chat-header">
+      <div class="chat-avatar">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M20 30V15" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M20 15C13 13 11 6 15 3C18 1 20 1 20 1C20 1 22 1 25 3C29 6 27 13 20 15Z" fill="#fff"/></svg>
+      </div>
+      <div>
+        <div class="chat-header-name">Prestina</div>
+        <div class="chat-header-sub">that night</div>
+      </div>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+      <div class="day-marker">lately</div>
+
+      <div class="bubble-row theirs" data-msg><div class="bubble">Kina Common but not so common ley nai it was obvious</div></div>
+      <div class="bubble-row theirs" data-msg><div class="bubble">Tei mathi mero name mai xa</div></div>
+      <div class="bubble-row mine" data-msg><div class="bubble">i never noticed</div></div>
+      <div class="bubble-row theirs" data-msg><div class="bubble">ey</div></div>
+      <div class="bubble-row theirs" data-msg><div class="bubble">ok</div></div>
+
+
+      <div class="day-marker">and it keeps happening</div>
+
+      <div class="bubble-row mine" data-msg><div class="bubble">yeah i messed up again</div></div>
+
+
+      <div class="bubble-row theirs" data-msg><div class="bubble">Whatever good night</div></div>
+      <div class="bubble-row mine" data-msg><div class="bubble">ayoo</div></div>
+      <div class="bubble-row mine" data-msg><div class="bubble">wait for me</div></div>
+      <div class="bubble-row mine" data-msg><div class="bubble">ill. make it up</div></div>
+
+      
+      <div class="typing-row" data-typing>
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="bubble-row mine" data-msg><div class="bubble">give me a second. let me actually say this properly</div></div>
+    </div>
+
+    <div class="continue-cue">↓ keep scrolling ↓</div>
+  </section>
+
+  <!-- ============ LETTER ============ -->
+  <section class="screen letter-screen">
+    <div class="letter-card">
+      <div class="tape t1"></div>
+      <div class="tape t2"></div>
+      <div class="letter-body">
+        <div class="mood-face" aria-hidden="true">
+          <svg viewBox="0 0 100 100">
+            <circle class="eye" cx="35" cy="42" r="3.4"/>
+            <circle class="eye" cx="65" cy="42" r="3.4"/>
+            <path class="tear" d="M35 48 q-3 8 0 12 q3 -4 0 -12"/>
+            <path class="mouth-sad" d="M35 68 Q50 58 65 68"/>
+            <path class="mouth-happy" d="M35 62 Q50 74 65 62"/>
+          </svg>
+        </div>
+        <p>Prestina,</p>
+        <p>I keep messing up. Not once — I keep doing it, in small ways, and somewhere in there you've ended up feeling hurt, like you have to always point it out.</p>
+        <p>That was never what I wanted. I don't want to be someone who makes you feel small. I want to be someone who actually pays attention, who makes you feel like you matter, every time, not just when it's convenient.</p>
+        <p>I'm not asking you to just accept "sorry." I'm asking for a chance to actually show it.</p>
+        <p>TBH this is my first time after a long time that im doing this so. This is not an excuse but it is the truth.</p>
+        <p>So from now on </p>
+
+        <ul class="letter-list">
+          <li>I'm going to notice you without you having to ask</li>
+          <li>when something's wrong, I'm going to actually stop and listen</li>
+          <li>I want you to feel important, always, not just today</li>
+        </ul>
+      </div>
+      <div class="letter-sign">— Sugam</div>
+
+      <svg class="doodle-corner" viewBox="0 0 70 90" fill="none">
+        <path d="M35 88C35 60 34 48 35 34" stroke="#7C9A6C" stroke-width="2" stroke-linecap="round"/>
+        <path d="M35 34C22 31 17 21 22 12C27 4 35 2 35 2C35 2 43 4 48 12C53 21 48 31 35 34Z" stroke="#B15C77" stroke-width="2" fill="none"/>
+        <path d="M35 55C25 52 20 45 24 39" stroke="#7C9A6C" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ FINAL / SIGNATURE ============ -->
+  <section class="screen final-screen">
+    <div class="polaroid">
+      <div class="polaroid-inner">
+        <svg viewBox="0 0 100 130" fill="none">
+          <path d="M50 128C50 90 49 70 50 48" stroke="#7C9A6C" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M50 48C32 44 25 30 32 18C39 8 50 5 50 5C50 5 61 8 68 18C75 30 68 44 50 48Z" stroke="#B15C77" stroke-width="2.5" fill="none"/>
+          <path d="M50 78C34 74 27 63 32 55" stroke="#7C9A6C" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M50 92C66 87 73 76 68 68" stroke="#7C9A6C" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="polaroid-caption">for Prestina</div>
+      <div class="polaroid-date">no more excuses, i promise</div>
+    </div>
+    <p class="final-note">Thank you for still being honest with me instead of just letting it go. That means more than you know.</p>
+  </section>
+
+  <footer>made this because you deserved more than an excuse.</footer>
+
+<script>
+  const rows = document.querySelectorAll('[data-msg], [data-typing]');
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach((entry, i)=>{
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const siblings = Array.from(el.parentElement.children).filter(c=>c.hasAttribute('data-msg')||c.hasAttribute('data-typing'));
+        const idx = siblings.indexOf(el);
+        setTimeout(()=>{ el.classList.add('visible'); }, Math.min(idx,1)*80);
+        observer.unobserve(el);
+      }
+    });
+  }, {threshold:0.35});
+  rows.forEach(el=>observer.observe(el));
+</script>
+  <!-- ============ FORGIVENESS QUESTIONS ============ -->
+  <section class="screen question-screen" id="forgiveness">
+    <div class="question-card" id="questionCard">
+      <p class="question-progress" id="questionProgress">one more thing</p>
+      <h2 id="questionTitle">Can we make up now?</h2>
+      <p id="questionText">I miss your smile. Let me try to make things right.</p>
+      <div class="question-actions">
+        <button class="try-button" id="positiveButton">I'll try</button>
+        <button class="no-button" disabled aria-disabled="true">No</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const forgivenessQuestions = [
+      {progress:'one more thing', title:'Can we make up now?', text:'I miss your smile. Let me try to make things right.', yes:"I'll try", no:'No'},
+      {progress:'be honest with me', title:'Do you think I can make it up to you?', text:'I know I messed up. I want to show you how much you mean to me.', yes:'You can try', no:'Not a chance'},
+      {progress:'last one, promise', title:'Can I make you smile again?', text:'Your happiness matters to me more than any excuse.', yes:'Make me smile', no:'Absolutely not'}
+    ];
+    let forgivenessStep = 0;
+    const card = document.getElementById('questionCard');
+    const progress = document.getElementById('questionProgress');
+    const title = document.getElementById('questionTitle');
+    const text = document.getElementById('questionText');
+    const positive = document.getElementById('positiveButton');
+    function showForgiveness(){
+      if(forgivenessStep >= forgivenessQuestions.length){
+        card.innerHTML = '<div class="yay-heart">♥</div><p class="question-progress">you forgave me</p><h2 class="yay-title">Yayy!</h2><p>Thank you for giving us another chance. I promise to make it count.</p><button class="restart-button" onclick="location.reload()">Read it again</button>';
+        return;
+      }
+      const q = forgivenessQuestions[forgivenessStep];
+      progress.textContent = q.progress;
+      title.textContent = q.title;
+      text.textContent = q.text;
+      positive.textContent = q.yes;
+      positive.onclick = () => { forgivenessStep++; showForgiveness(); };
+    }
+    showForgiveness();
+  </script>
+</body>
+</html>
